@@ -1,4 +1,4 @@
-export function async(param: string): Promise<string> {
+export function fetcher(param: string): Promise<string> {
   // Your async logic here
   return new Promise((resolve, reject) => {
     // Simulate an async operation

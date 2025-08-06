@@ -1,9 +1,9 @@
 import { Suspense } from 'react';
 import ExerciseCard from "@/components/common/excerciseCard";
-import { async } from "@/lib/api";
+import { fetcher } from "@/lib/api";
 
 export default function Page() {
-    const fetchPromise = async("example");
+    const fetchPromise = fetcher("example");
     return (
         <div>
             <h1>My Dashboard</h1>
