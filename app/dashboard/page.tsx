@@ -1,6 +1,8 @@
 import { Suspense } from 'react';
 import ExerciseCard from "@/components/common/excerciseCard";
 import { fetcher } from "@/lib/api";
+import { SignOut } from '@/components/auth/signout-button';
+import { Username } from '@/components/auth/username';
 
 export default function Page() {
     const fetchPromise = fetcher("example");
@@ -13,6 +15,9 @@ export default function Page() {
                     <ExerciseCard title="Cardio Workout" description="Improve your cardiovascular health with our cardio exercises." fetchPromise={fetchPromise} />
                 </div>
             </Suspense>
+            <Username />
+            <SignOut />
+
         </div>
     );
 }
