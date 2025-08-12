@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { createRoutine } from '@/lib/db';
 import { CreateRoutineExercise } from '@/types/db';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -38,7 +37,18 @@ export default function NewRoutinePage() {
         setMessage('');
 
         try {
-            const response = await createRoutine(routineName, exercises);
+            const response = await fetch('/api/routines', {
+                method: 'POST',
+                body: JSON.stringify({
+                    routine_name: routineName,
+                    exercises: exercises.map(exercise => ({
+                        exercise_api_id: exercise.exercise_api_id,
+                        order: exercise.order,
+                        sets: exercise.sets || null,
+                        reps: exercise.reps || null,
+                    })),
+                }),
+            });
             setMessage(`Successfully created routine: ${routineName}`);
             console.log('Routine created:', response);
             // Reset form
