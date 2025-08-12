@@ -15,14 +15,11 @@ export interface RoutineExercise {
   created_at: string;
 }
 
-// Interface for the POST request body to create a new routine
 export interface CreateRoutineRequest {
-  user_id: string;
   routine_name: string;
   exercises: CreateRoutineExercise[];
 }
 
-// Interface for the exercises array within the POST request
 export interface CreateRoutineExercise {
   exercise_api_id: string;
   order: number;
