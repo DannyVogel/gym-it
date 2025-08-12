@@ -1,6 +1,9 @@
 import { Suspense } from 'react';
-import ExerciseCard from "@/components/common/excerciseCard";
+import ExerciseCard from "@/components/common/exerciseCard";
 import { getExerciseById } from "@/lib/api";
+import NewRoutineForm from "@/components/routines/addRoutine";
+import GetRoutine from "@/components/routines/getRoutine";
+import ExerciseSearch from '@/components/common/exerciseSearch';
 
 export default function Page() {
     const fetchPromise = getExerciseById("ztAa1RK");
@@ -13,6 +16,18 @@ export default function Page() {
                     <ExerciseCard fetchPromise={fetchPromise} />
                 </div>
             </Suspense>
+            <div className="mt-8">
+                <h2 className="text-xl font-semibold mb-4">Search Exercises</h2>
+                <ExerciseSearch />
+            </div>
+            <div className="mt-8">
+                <h2 className="text-xl font-semibold mb-4">Add New Routine</h2>
+                <NewRoutineForm />
+            </div>
+            <div className="mt-8">
+                <h2 className="text-xl font-semibold mb-4">View Routines</h2>
+                <GetRoutine />
+            </div>
 
         </div>
     );
