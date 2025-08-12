@@ -20,9 +20,7 @@ export async function searchExercises({
   });
 
   const response = await fetch(`${API_BASE_URL}/exercises/search?${params}`);
-  if (!response.ok) {
-    throw new Error("Failed to search exercises");
-  }
+  if (!response.ok) throw new Error("Failed to search exercises");
   return response.json();
 }
 
