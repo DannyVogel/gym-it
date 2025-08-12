@@ -1,71 +1,112 @@
-import {
-  CreateRoutineRequest,
-  CreateRoutineExercise,
-  RoutineExercise,
-} from "@/types/db";
-/**
- * Fetches all workout routines for a user.
- * @returns {Promise<Array>} A list of routine objects.
- */
-export async function getRoutines(): Promise<Array<unknown>> {
-  const response = await fetch("/api/routines");
-  if (!response.ok) {
-    throw new Error("Failed to fetch routines");
+import { CreateRoutineExercise } from "@/types/db";
+import { createClient } from "@/utils/supabase/server";
+import { NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+
+export async function getRoutines() {
+  try {
+    const supabase = await createClient();
+    const session = await auth();
+    if (!session?.user)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const userId = session?.user.id;
+
+    if (!userId)
+      return NextResponse.json(
+        { error: "User ID is required" },
+        { status: 400 }
+      );
+
+    const { data, error } = await supabase
+      .from("workout_routines")
+      .select(
+        `
+          id,
+          name,
+          routine_exercises (
+            exercise_api_id,
+            order,
+            sets,
+            reps
+          )
+          `
+      )
+      .eq("user_id", userId)
+      .order("order", { foreignTable: "routine_exercises" });
+
+    if (error) {
+      console.error("Error fetching routines:", error);
+      return NextResponse.json(
+        { error: "Failed to fetch routines" },
+        { status: 500 }
+      );
+    }
+    console.log("routines data", data);
+
+    return NextResponse.json(data, { status: 200 });
+  } catch (error) {
+    console.error("Error in getRoutines:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch routines" },
+      { status: 500 }
+    );
   }
-  return response.json();
 }
 
-/**
- * Creates a new workout routine along with its exercises.
- * @param {string} userId - The ID of the user creating the routine.
- * @param {string} routineName - The name of the routine.
- * @param {CreateRoutineExercise[]} exercises - An array of exercise details for the routine.
- * @returns {Promise<CreateRoutineResponse>} The created routine ID and its exercises.
- */
 export async function createRoutine(
-  userId: string,
   routineName: string,
   exercises: CreateRoutineExercise[]
-): Promise<{ routine_id: string; exercises: RoutineExercise[] }> {
-  const requestBody: CreateRoutineRequest = {
-    user_id: userId,
-    routine_name: routineName,
-    exercises: exercises,
-  };
+) {
+  const supabase = await createClient();
+  const session = await auth();
+  if (!session?.user)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const userId = session?.user.id;
 
-  const response = await fetch("/api/routines", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(requestBody),
-  });
+  let newRoutineId: string | undefined;
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || "Failed to create routine");
+  try {
+    const { data: newRoutine, error: routineError } = await supabase
+      .from("workout_routines")
+      .insert([{ user_id: userId, name: routineName }])
+      .select("id")
+      .single();
+
+    if (routineError) throw routineError;
+
+    newRoutineId = newRoutine.id;
+
+    const routineExercisesData = exercises.map((exercise) => ({
+      routine_id: newRoutineId,
+      exercise_api_id: exercise.exercise_api_id,
+      order: exercise.order,
+      sets: exercise.sets || null,
+      reps: exercise.reps || null,
+    }));
+
+    const { data: newExercises, error: exercisesError } = await supabase
+      .from("routine_exercises")
+      .insert(routineExercisesData)
+      .select();
+
+    if (exercisesError) throw exercisesError;
+
+    return NextResponse.json(
+      {
+        routine_id: newRoutineId,
+        exercises: newExercises,
+      },
+      { status: 201 }
+    );
+  } catch (error) {
+    if (newRoutineId) {
+      console.warn(`Rolling back routine creation for ID: ${newRoutineId}`);
+      await supabase.from("workout_routines").delete().eq("id", newRoutineId);
+    }
+    console.error("An error occurred during routine creation:", error);
+    return NextResponse.json(
+      { error: "Failed to create routine due to an error" },
+      { status: 500 }
+    );
   }
-
-  return response.json();
-}
-
-/**
- * Adds an exercise to a specific routine.
- * @param {string} routineId - The ID of the routine.
- * @param {string} exerciseApiId - The ID of the exercise from the API.
- * @param {number} order - The order of the exercise.
- * @returns {Promise<Object>} The added exercise object.
- */
-export async function addExerciseToRoutine(
-  routineId: string,
-  exerciseApiId: string,
-  order: number
-): Promise<object> {
-  const response = await fetch(`/api/routines/${routineId}/exercises`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ exerciseApiId, order }),
-  });
-  if (!response.ok) {
-    throw new Error("Failed to add exercise");
-  }
-  return response.json();
 }
