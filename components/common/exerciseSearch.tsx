@@ -45,7 +45,6 @@ export default function ExerciseSearch() {
                 throw new Error(error || 'Failed to fetch search results');
             }
             const exercises = await response.json();
-            console.log("Search results:", exercises);
             setResults(exercises);
         } catch (error) {
             console.error('Search error:', error);

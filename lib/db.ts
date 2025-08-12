@@ -41,7 +41,6 @@ export async function getRoutines() {
         { status: 500 }
       );
     }
-    console.log("routines data", data);
 
     return NextResponse.json(data, { status: 200 });
   } catch (error) {

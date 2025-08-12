@@ -50,8 +50,6 @@ export default function NewRoutinePage() {
                 }),
             });
             setMessage(`Successfully created routine: ${routineName}`);
-            console.log('Routine created:', response);
-            // Reset form
             setRoutineName('');
             setExercises([{ exercise_api_id: '', order: 1 }]);
         } catch (error: any) {

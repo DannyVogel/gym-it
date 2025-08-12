@@ -12,7 +12,6 @@ export default function GetRoutine() {
             if (!response.ok)
                 throw new Error('Failed to fetch routines');
             const data = await response.json();
-            console.log('Fetched routines:', data);
             setRoutines(data);
         } catch (error) {
             console.error("Error fetching routines:", error);
