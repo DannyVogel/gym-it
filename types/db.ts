@@ -1,17 +1,24 @@
+interface RoutineExercise {
+  id: string;
+  routine_id: string;
+  exercise_api_id: string;
+  reps: number;
+  sets: number;
+  order: number;
+}
+
+interface Routine {
+  id: string;
+  name: string;
+  routine_exercises: RoutineExercise[];
+}
+
+export type Routines = Routine[];
+
 export interface WorkoutRoutine {
   id: string;
   user_id: string;
   name: string;
-  created_at: string;
-}
-
-export interface RoutineExercise {
-  id: string;
-  routine_id: string;
-  exercise_api_id: string;
-  order: number;
-  sets: number | null;
-  reps: number | null;
   created_at: string;
 }
 
