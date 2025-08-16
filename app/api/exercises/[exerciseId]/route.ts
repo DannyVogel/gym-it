@@ -1,11 +1,14 @@
-import { NextResponse } from "next/server";
 import { getExerciseById } from "@/lib/api";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET({
-  params,
-}: {
-  params: Promise<{ exerciseId: string }>;
-}) {
+export async function GET(
+  request: NextRequest, // Add this first parameter
+  {
+    params,
+  }: {
+    params: Promise<{ exerciseId: string }>;
+  }
+) {
   const { exerciseId } = await params;
   try {
     const exercise = await getExerciseById(exerciseId);

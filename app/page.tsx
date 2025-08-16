@@ -1,6 +1,7 @@
-import DashbordLinkButton from "@/components/common/dashboardLinkButton"
+import DashbordLinkButton from "@/components/common/dashboardLinkButton";
 import { AuthWarn } from "@/components/auth/auth-warn";
-import { Username } from '@/components/auth/username';
+import { Username } from "@/components/auth/username";
+import { Suspense } from "react";
 
 export default async function Home() {
   return (
@@ -9,7 +10,9 @@ export default async function Home() {
       <p className="text-lg mb-8">Your personal fitness management system.</p>
       <Username />
       <DashbordLinkButton />
-      <AuthWarn />
+      <Suspense fallback={<div>Loading...</div>}>
+        <AuthWarn />
+      </Suspense>
     </div>
   );
 }
