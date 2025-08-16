@@ -1,54 +1,50 @@
-import { CreateRoutineExercise } from "@/types/db";
+import { CreateRoutineExercise, Routines } from "@/types/db";
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 
-export async function getRoutines() {
+export async function getRoutines(): Promise<Routines | null> {
   try {
     const supabase = await createClient();
     const session = await auth();
-    if (!session?.user)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    const userId = session?.user.id;
 
-    if (!userId)
-      return NextResponse.json(
-        { error: "User ID is required" },
-        { status: 400 }
-      );
+    if (!session?.user) {
+      console.error("Unauthorized access attempt");
+      return null;
+    }
+
+    const userId = session?.user.id;
+    if (!userId) {
+      console.error("User ID is required");
+      return null;
+    }
 
     const { data, error } = await supabase
       .from("workout_routines")
       .select(
         `
-          id,
-          name,
-          routine_exercises (
-            exercise_api_id,
-            order,
-            sets,
-            reps
-          )
-          `
+        id,
+        name,
+        routine_exercises (
+          exercise_api_id,
+          order,
+          sets,
+          reps
+        )
+      `
       )
       .eq("user_id", userId)
       .order("order", { foreignTable: "routine_exercises" });
 
     if (error) {
       console.error("Error fetching routines:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch routines" },
-        { status: 500 }
-      );
+      return null;
     }
 
-    return NextResponse.json(data, { status: 200 });
+    return data as Routines;
   } catch (error) {
     console.error("Error in getRoutines:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch routines" },
-      { status: 500 }
-    );
+    return null;
   }
 }
 
@@ -58,10 +54,12 @@ export async function createRoutine(
 ) {
   const supabase = await createClient();
   const session = await auth();
-  if (!session?.user)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const userId = session?.user.id;
 
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const userId = session.user.id;
   let newRoutineId: string | undefined;
 
   try {
@@ -100,8 +98,13 @@ export async function createRoutine(
   } catch (error) {
     if (newRoutineId) {
       console.warn(`Rolling back routine creation for ID: ${newRoutineId}`);
-      await supabase.from("workout_routines").delete().eq("id", newRoutineId);
+      try {
+        await supabase.from("workout_routines").delete().eq("id", newRoutineId);
+      } catch (cleanupError) {
+        console.error("Failed to cleanup routine:", cleanupError);
+      }
     }
+
     console.error("An error occurred during routine creation:", error);
     return NextResponse.json(
       { error: "Failed to create routine due to an error" },
