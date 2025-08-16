@@ -61,8 +61,10 @@ export default function NewRoutinePage() {
       setMessage(`Successfully created routine: ${routineName}`);
       setRoutineName("");
       setExercises([{ exercise_api_id: "", order: 1 }]);
-    } catch (error: any) {
-      setMessage(`Error: ${error.message}`);
+    } catch (error) {
+      if (error instanceof Error) {
+        setMessage(`Error: ${error.message}`);
+      }
     } finally {
       setLoading(false);
     }
