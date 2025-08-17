@@ -7,6 +7,9 @@ export interface Exercise {
   equipments: string[];
   secondaryMuscles: string[];
   instructions: string[];
+  target?: string;
+  bodyPart?: string;
+  equipment?: string;
 }
 
 export interface SearchMetadata {
