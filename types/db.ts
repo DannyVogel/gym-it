@@ -32,6 +32,7 @@ export interface CreateRoutineExercise {
   order: number;
   sets?: number;
   reps?: number;
+  exerciseName: string;
 }
 
 export interface CreateRoutineResponse {
