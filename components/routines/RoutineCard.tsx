@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Routine } from "@/types/db";
 import {
   Card,
@@ -19,10 +20,13 @@ interface RoutineCardProps {
 
 export default function RoutineCard({ routine }: RoutineCardProps) {
   const [isExerciseModalOpen, setIsExerciseModalOpen] = useState(false);
-  const handleRoutineClick = (routineId: string, routineName: string) => {
+  const router = useRouter();
+
+  const handleStartWorkout = (routineId: string, routineName: string) => {
     console.log(
       `Starting workout for routine: ${routineName} (ID: ${routineId})`
     );
+    router.push(`/workout/${routineId}`);
   };
 
   const exerciseCount = routine.routine_exercises.length;
@@ -102,7 +106,7 @@ export default function RoutineCard({ routine }: RoutineCardProps) {
             className="w-full"
             onClick={(e) => {
               e.stopPropagation();
-              handleRoutineClick(routine.id, routine.name);
+              handleStartWorkout(routine.id, routine.name);
             }}
           >
             <Play className="w-4 h-4 mr-2" />
