@@ -4,7 +4,7 @@ import { createClient } from "@/utils/supabase/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { routineId: string } }
+  { params }: { params: Promise<{ routineId: string }> }
 ) {
   try {
     // Get user session
@@ -13,7 +13,7 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { routineId } = params;
+    const { routineId } = await params;
     const supabase = await createClient();
 
     // Fetch the specific routine with its exercises
