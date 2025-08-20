@@ -25,6 +25,7 @@ export async function getRoutines(): Promise<Routines | null> {
         `
         id,
         name,
+        created_at,
         routine_exercises (
           exercise_api_id,
           order,

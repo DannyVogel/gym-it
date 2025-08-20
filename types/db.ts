@@ -1,4 +1,4 @@
-interface RoutineExercise {
+export interface RoutineExercise {
   id: string;
   routine_id: string;
   exercise_api_id: string;
@@ -7,9 +7,10 @@ interface RoutineExercise {
   order: number;
 }
 
-interface Routine {
+export interface Routine {
   id: string;
   name: string;
+  created_at: string;
   routine_exercises: RoutineExercise[];
 }
 
