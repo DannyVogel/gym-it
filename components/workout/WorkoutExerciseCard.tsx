@@ -26,6 +26,14 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+const formatInstruction = (instruction: string) => {
+  const parts = instruction.match(/^Step:(\d+)(.*)$/);
+  return {
+    step: parts ? `${parts[1]}:` : "",
+    description: parts ? parts[2] : instruction,
+  };
+};
+
 interface WorkoutExerciseCardProps {
   exercise: RoutineExercise;
   exerciseData: Exercise;
@@ -84,14 +92,18 @@ export default function WorkoutExerciseCard({
                 </DialogHeader>
                 <ScrollArea className="max-h-[60vh] pr-4">
                   <div className="space-y-4">
-                    {exerciseData.instructions.map((instruction, index) => (
-                      <div key={index} className="text-sm">
-                        <span className="font-medium text-primary">
-                          {index + 1}.
-                        </span>{" "}
-                        {instruction}
-                      </div>
-                    ))}
+                    {exerciseData.instructions.map((instruction, index) => {
+                      const { step, description } =
+                        formatInstruction(instruction);
+                      return (
+                        <div key={index} className="text-sm">
+                          <span className="font-medium text-primary">
+                            {step || `${index + 1}.`}
+                          </span>{" "}
+                          {description}
+                        </div>
+                      );
+                    })}
                   </div>
                 </ScrollArea>
               </DialogContent>
@@ -173,15 +185,6 @@ export default function WorkoutExerciseCard({
       <div className="space-y-3">
         <div className="grid grid-cols-2 gap-3">
           <Button
-            size="lg"
-            className="h-14"
-            onClick={onComplete}
-            disabled={isPaused}
-          >
-            <Check className="w-5 h-5 mr-2" />
-            Complete
-          </Button>
-          <Button
             variant="outline"
             size="lg"
             className="h-14"
@@ -190,6 +193,15 @@ export default function WorkoutExerciseCard({
           >
             <SkipForward className="w-5 h-5 mr-2" />
             Skip
+          </Button>
+          <Button
+            size="lg"
+            className="h-14"
+            onClick={onComplete}
+            disabled={isPaused}
+          >
+            <Check className="w-5 h-5 mr-2" />
+            Complete
           </Button>
         </div>
 
