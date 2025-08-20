@@ -33,3 +33,21 @@ export async function getExerciseById(
   }
   return response.json();
 }
+
+export async function getExercisesByIds(
+  exerciseIds: string[]
+): Promise<ExerciseByIdResponse[]> {
+  const promises = exerciseIds.map(async (id) => {
+    try {
+      return await getExerciseById(id);
+    } catch (error) {
+      console.error(`Failed to fetch exercise ${id}:`, error);
+      return null;
+    }
+  });
+
+  const results = await Promise.all(promises);
+  return results.filter(
+    (result): result is ExerciseByIdResponse => result !== null
+  );
+}
