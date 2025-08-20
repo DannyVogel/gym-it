@@ -30,9 +30,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="font-sans grid grid-rows-[80px_1fr_80px] min-h-screen ">
+        <div className="font-sans flex flex-col min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
           <Header />
-          {children}
+          <main className="flex-1">{children}</main>
           <Footer />
         </div>
         <Toaster richColors />
